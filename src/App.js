@@ -1,60 +1,67 @@
 import React, {Component} from "react";
 import Wrapper from "./components/Wrapper";
-import Header from "./components/Header";
+import Header from "./components/Header/Header";
 import Card from "./components/Card/Card";
-import Title from "./components/Title";
 import CardPiece from "./components/CardPiece/CardPiece";
 import cards from "./cards.json";
 
 class App extends Component{
   state = {
-    Card, 
+    cards: cards, 
     score: 0,
     highScore: 0,
-    clicked: [],
-    winMessage: ""
+    clicked: []
   };
 
-  // gameOver = () => {
-  //   if(this.state.score > this.state.highScore){
-  //     this.setState({highScore: this.state.score}, function(){
-  //       console.log(this.state.highScore);        
-  //     });
-  //   }
-  //   this.state.card.forEach(card => {
-  //     card.count=0;
-  //   });
-  //   alert("Game Over:(\nScore: $(this.state.score)");
-  //   this.setState({score: 0});
-  //   return true;
-  // }
+  gameOver = gameStatus => {
+    var statMessage = "";
 
-  // clicksCount = id =>{
-  //   if (this.state.clicked.indexOf(id) === -1){
-  //     this.handleIncrement();
-  //     this.setState({clicked: this.state.clicked.concat(id)});
-  //   }else {
-  //     this.clickReset();
-  //   }
-  // };
+    if(gameStatus === "WIN"){
+      statMessage = "YOU WIN!";
+    } else{
+      statMessage = "YOU LOSE!"
+    }
 
-  // handleIncrement = () => {
-  //   const nScore = this.state.currentScore +1;
-  //   this.setState({
-  //     score: nScore,
-  //     winMessage: ""
-  //   });
-  //   if(nScore===12){
-  //     this.setState({winMessage: "You Won!!!!"});
-  //   } else {
-  //   this.gameOver();
-  // }
-  // }
+    alert(`${statMessage} \n Score: ${this.state.score}`);
+    
+    var hScore = this.state.highScore;
+
+    if(this.state.score > this.state.highScore){
+      hScore = this.state.score;
+    }
+
+    this.setState({score: 0, clicked: [], highScore: hScore});
+    return true;
+  }
+
+  checkClicks = id => {
+    if(this.state.clicked.indexOf(id) === -1){
+      this.state.clicked.push(id);
+      this.handleIncrement();
+    } else{
+      this.gameOver("LOSE");
+    }
+  }
+
+  handleIncrement = () => {
+    const nScore = this.state.score +1;
+    this.setState({
+      score: nScore
+    });
+
+    if(nScore===cards.length){
+      this.gameOver("WIN");
+      return true;
+    }
+
+    this.state.cards.sort(()=>Math.random() - 0.5);
+    return true;
+  }
 
   displayCardPiece = () =>{
     var cardList = [];
     for(var i = 0; i < cards.length; i++){
-      cardList.push(<CardPiece name = {cards[i].name} image = {cards[i].image}/>);
+      cardList.push(<CardPiece checkClicks = {this.checkClicks} id = {cards[i].id} name = {cards[i].name} image = {cards[i].image}/>);
     }
     return cardList;
   }
@@ -63,30 +70,14 @@ class App extends Component{
     var cardList = this.displayCardPiece();
     return(
       <Wrapper>
-        <Header score = {this.state.score} highScore={this.state.highScore} winMessage={this.state.winMessage}>
+        <Header score = {this.state.score} highScore={this.state.highScore}>
         Clicky React Game!
         </Header>
-        <Title>
-        Click on each image and you should not click any repeated image or you will loose this game and the score too!!!
-        </Title>
         <Card>
           {cardList}
         </Card>
       </Wrapper>
     );
   }
-
-  
-  //   this.state.card.find((one, i) =>{
-  //     if(one.id === id){
-  //       if(card[i].count = card[i].count + 1);
-  //       this.setState({score: this.state.score + 1}), 
-  //       function(){
-  //         console.log(this.state.score);          
-  //       });
-  //       this.state.card.sort() => Math.random() - 
-  //     }
-  //   })
-  // }
 }
 export default App;
